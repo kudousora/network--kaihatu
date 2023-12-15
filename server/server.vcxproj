@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{2d36e243-aea3-4501-a583-92cb2dd282d6}</ProjectGuid>
-    <RootNamespace>networka</RootNamespace>
+    <ProjectGuid>{a6359863-92dd-43bd-9ed8-93f147fd5fc4}</ProjectGuid>
+    <RootNamespace>server</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,8 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Client.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Server.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
