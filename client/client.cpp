@@ -9,11 +9,12 @@ const unsigned short SERVERPORT = 8888;
 // 送受信するメッセージの最大値
 const unsigned int MESSAGELENGTH = 1024;
 
+// WinSockの初期化
+int InitWinSock();
 
 int main()
 {
-	std::cout << "Chat Server" << std::endl;
-
+	std::cout << "Chat Client" << std::endl;
 
 	WSADATA wsaData;
 	int ret = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -35,19 +36,15 @@ int main()
 	std::cout << "Success: socket" << std::endl;
 
 
-	// 固定アドレスにするためにソケットアドレス情報の割り当て
-	struct sockaddr_in bindAddr;
-	memset(&bindAddr, 0, sizeof(bindAddr));
-	bindAddr.sin_family = AF_INET;
-	bindAddr.sin_port = htons(SERVERPORT);
-	bindAddr.sin_addr.s_addr = htonl(INADDR_ANY);
-
-	if (bind(sock, (struct sockaddr*)&bindAddr, sizeof(bindAddr)) < 0)
-	{
-		std::cout << "Error: bind ( ErrorCode:" << WSAGetLastError() << " )" << std::endl;
-		return 1;
-	}
-	std::cout << "Success: bind" << std::endl;
+	// 宛先となるサーバのソケットアドレス情報の割り当て
+	std::string serverIpv4Address;
+	std::cout << "Input Server IPv4 Address : ";
+	std::cin >> serverIpv4Address;
+	struct sockaddr_in toAddr;
+	memset(&toAddr, 0, sizeof(toAddr));
+	toAddr.sin_family = AF_INET;
+	toAddr.sin_port = htons(SERVERPORT);
+	inet_pton(AF_INET, serverIpv4Address.c_str(), &toAddr.sin_addr.s_addr);
 
 
 	while (true)
@@ -55,6 +52,19 @@ int main()
 		char buff[MESSAGELENGTH];			// 送受信メッセージの格納領域
 		struct sockaddr_in fromAddr;		// 送信元アドレスの格納領域
 		int fromlen = sizeof(fromAddr);		// fromAddrのサイズ
+
+
+		// 送信用メッセージの入力
+		std::cout << "Input message : ";
+		std::cin >> buff;
+
+		// 送信！
+		ret = sendto(sock, buff, strlen(buff), 0, (struct sockaddr*)&toAddr, sizeof(toAddr));
+		if (ret != strlen(buff))
+		{
+			std::cout << "Error: sendto ( ErrorCode:" << WSAGetLastError() << " )" << std::endl;
+			return 1;
+		}
 
 		// 受信待ち
 		std::cout << "wait..." << std::endl;
@@ -68,19 +78,14 @@ int main()
 		}
 		buff[ret] = '\0';	// 終端記号追加
 		std::cout << "Receive message : " << buff << std::endl;
-
-		// 送信用メッセージの入力
-		std::cout << "Input message : ";
-		std::cin >> buff;
-
-		// 送信！
-		ret = sendto(sock, buff, strlen(buff), 0, (struct sockaddr*)&fromAddr, fromlen);
-		if (ret != strlen(buff))
-		{
-			std::cout << "Error: sendto ( ErrorCode:" << WSAGetLastError() << " )" << std::endl;
-			return 1;
-		}
 	}
 
 	return 0;
+}
+
+// WinSockの初期化
+int InitWinSock()
+{
+	WSADATA wsaData;
+	return WSAStartup(MAKEWORD(2, 2), &wsaData);
 }
